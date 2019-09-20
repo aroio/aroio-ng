@@ -1,10 +1,11 @@
 [Unit]
 Description=WPA supplicant daemon (interface-specific version)
-Requires=sys-subsystem-net-devices-%i.device
+#Requires=sys-subsystem-net-devices-%i.device
 After=sys-subsystem-net-devices-%i.device
 Before=systemd-networkd.service
 Wants=network.target
 ConditionFileNotEmpty=/etc/wpa_supplicant/wpa_supplicant-%I.conf
+ConditionPathExists=/etc/systemd/network/25-wireless.network
 
 # NetworkManager users will probably want the dbus version instead.
 

@@ -3,14 +3,21 @@
 . /boot/userconfig.txt
 
 SDDIR='/boot/filter'
-RAMDIR='/tmp/filter'
+OLDSDDIR="/boot/brutefir"
+RAMDIR='/run/filter'
 
 mkdir -p "$SDDIR"
 mkdir -p "$RAMDIR"
+[ -e /boot/brutefir ] && mv /boot/brutefir /boot/filter
 cp -r "$SDDIR"/* "$RAMDIR"
 
 # Mitgelieferte Filter bei Bedarf auspacken
-[ "$LOAD_PREFILTER" = "ON" ] && /bin/zcat /etc/brutefir/filter.tgz | tar -xvf - -C /tmp
+[ "$LOAD_PREFILTER" = "ON" ] && /bin/zcat /etc/brutefir/filter.tgz | tar -xvf - -C /run
+cardmount rw
+rsync --exclude "*.tmp" -vrLt --delete "$RAMDIR"/ "$SDDIR"
+cardmount ro
+
+chown -Rh sftparoio:users /run/filter
 
 # Fälle:
 # 1: Neues File im RAM -> nach SDKarte kopieren.
@@ -18,9 +25,9 @@ cp -r "$SDDIR"/* "$RAMDIR"
 
 while (true)
 do
-	inotifywait -r -e modify,attrib,close_write,move,create,delete "$RAMDIR"
-	echo "Files changed in "$RAMDIR", will synchronize changes to "$SDDIR"..."
-	cardmount rw
-	rsync -vrlt --delete "$RAMDIR"/ "$SDDIR"
-	cardmount ro
+    inotifywait -r -e modify,attrib,close_write,move,create,delete --exclude '\.tmp' "$RAMDIR"
+    echo "Files changed in "$RAMDIR", will synchronize changes to "$SDDIR"..."
+    cardmount rw
+    rsync --exclude "*.tmp" -vLrt --delete "$RAMDIR"/ "$SDDIR"
+    cardmount ro
 done

@@ -3,6 +3,7 @@
 . /boot/userconfig.txt
 
 ACTION="$1"
+[ -e /tmp/measurement ] && AUDIO_OUTPUT=$MEASUREMENT_OUTPUT
 
 echo "Controlaudio "$ACTION" ..."
 
@@ -12,7 +13,11 @@ echo "Controlaudio "$ACTION" ..."
 function Start()
 {
 
-sed -i "/#SAMPLINGRATE/c\        rate "$RATE" #SAMPLINGRATE" /etc/asound.conf
+	sed -i "/#SAMPLINGRATE/c\        rate "$RATE" #SAMPLINGRATE" /etc/asound.conf
+	sed -i "/defaults.pcm.rate_converter/c\defaults.pcm.rate_converter \"$RESAMPLING\"" /etc/asound.conf
+	sed -i "/output_rate/c\output_rate = "$SPRATE""  /etc/shairport-sync.conf
+	sed -i "/buffer_size/c\buffer_size = "$SP_OUTBUFFER""  /etc/shairport-sync.conf
+#	sed -i "/period_size/c\period_size = "$SP_PERIOD""  /etc/shairport-sync.conf
 
 	case "$AUDIO_OUTPUT" in
 		vol-plug)
@@ -30,7 +35,7 @@ sed -i "/#SAMPLINGRATE/c\        rate "$RATE" #SAMPLINGRATE" /etc/asound.conf
 				;;
 
 				bluealsaaplay)
-					systemctl "$ACTION" bluealsa-aplay.service
+					[ -e /sys/class/bluetooth/hci0 ] && systemctl "$ACTION" bluealsa-aplay.service
 				;;
 			esac
 		;;
@@ -50,7 +55,7 @@ sed -i "/#SAMPLINGRATE/c\        rate "$RATE" #SAMPLINGRATE" /etc/asound.conf
 				;;
 
 				bluealsaaplay)
-					systemctl "$ACTION" bluealsa-aplay.service
+					[ -e /sys/class/bluetooth/hci0 ] && systemctl "$ACTION" bluealsa-aplay.service
 				;;
 			esac
 		;;
@@ -59,61 +64,62 @@ sed -i "/#SAMPLINGRATE/c\        rate "$RATE" #SAMPLINGRATE" /etc/asound.conf
 			[ "$DMIX_SQUEEZELITE"   = "ON" ] && systemctl "$ACTION" squeezelite.service
 			[ "$DMIX_GMEDIARENDER"  = "ON" ] && systemctl "$ACTION" gmediarender.service
 			[ "$DMIX_SHAIRPORTSYNC" = "ON" ] && systemctl "$ACTION" shairport-sync.service
-			[ "$DMIX_BLUEALSAAPLAY" = "ON" ] && systemctl "$ACTION" bluealsa-aplay.service
+			[[ "$DMIX_BLUEALSAAPLAY" = "ON" && -e /sys/class/bluetooth/hci0 ]] && systemctl "$ACTION" bluealsa-aplay.service
 		;;
 
 		vol-plug-dmix-ms)
 			[ "$DMIXMS_SQUEEZELITE"   = "ON" ] && systemctl "$ACTION" squeezelite.service
 			[ "$DMIXMS_GMEDIARENDER"  = "ON" ] && systemctl "$ACTION" gmediarender.service
 			[ "$DMIXMS_SHAIRPORTSYNC" = "ON" ] && systemctl "$ACTION" shairport-sync.service
-			[ "$DMIXMS_BLUEALSAAPLAY" = "ON" ] && systemctl "$ACTION" bluealsa-aplay.service
+			[[ "$DMIXMS_BLUEALSAAPLAY" = "ON" && -e /sys/class/bluetooth/hci0 ]] && systemctl "$ACTION" bluealsa-aplay.service
 		;;
 
-		vol-jack)
+		jack)
 			systemctl "$ACTION" jackd.service
-			[ "$ACTION" = "start" ] && until jack_lsp ; do sleep 0.1 ; done
-			[[ "$JACK_NETJACK"      = "ON"  && "$ACTION" != "stop" ]] && echo "netmanager start" && jack_load netmanager
+			until jack_lsp | grep jackmixer ; do sleep 0.1 ; done
+			sleep 1
+			[[ "$JACK_NETJACK"      = "ON"  && "$ACTION" != "stop" ]] && echo "netmanager start" && jack_load netmanager && connect_netjackports
 			[ "$JACK_SQUEEZELITE"   = "ON" ] && systemctl "$ACTION" squeezelite.service
 			[ "$JACK_GMEDIARENDER"  = "ON" ] && systemctl "$ACTION" gmediarender.service
 			[ "$JACK_SHAIRPORTSYNC" = "ON" ] && systemctl "$ACTION" shairport-sync.service
-			[ "$JACK_BLUEALSAAPLAY" = "ON" ] && systemctl "$ACTION" bluealsa-aplay.service
-			[ "$JACK_INPUT" = "ON" ] && sleep 0.2 && jack_connect system:capture_1 system:playback_1 && jack_connect system:capture_2 system:playback_2
+			[[ "$JACK_BLUEALSAAPLAY" = "ON" && -e /sys/class/bluetooth/hci0 ]] && systemctl "$ACTION" bluealsa-aplay.service
+			[ "$JACK_INPUT" = "ON" ] && sleep 0.2 && jack_connect system:capture_1 jackmixer:in1_left && jack_connect system:capture_2 jackmixer:in1_right
 		;;
 
-		vol-jack-ms)
+		jack-ms)
 			systemctl "$ACTION" jackd.service
-			[ "$ACTION" = "start" ] && until jack_lsp ; do sleep 0.1 ; done
-			[[ "$JACKMS_NETJACK"      = "ON"  && "$ACTION" != "stop" ]] &&  jack_load netmanager
+			until jack_lsp | grep jackmixer ; do sleep 0.1 ; done
+			[[ "$JACKMS_NETJACK"      = "ON"  && "$ACTION" != "stop" ]] &&  jack_load netmanager && connect_netjackports
 			[ "$JACKMS_SQUEEZELITE"   = "ON" ] && systemctl "$ACTION" squeezelite.service
 			[ "$JACKMS_GMEDIARENDER"  = "ON" ] && systemctl "$ACTION" gmediarender.service
 			[ "$JACKMS_SHAIRPORTSYNC" = "ON" ] && systemctl "$ACTION" shairport-sync.service
-			[ "$JACKMS_BLUEALSAAPLAY" = "ON" ] && systemctl "$ACTION" bluealsa-aplay.service
-			[ "$JACKMS_INPUT" = "ON" ] && sleep 0.2 && jack_connect system:capture_1 system:playback_1 && jack_connect system:capture_2 system:playback_2
+			[[ "$JACKMS_BLUEALSAAPLAY" = "ON" && -e /sys/class/bluetooth/hci0 ]] && systemctl "$ACTION" bluealsa-aplay.service
+			[ "$JACKMS_INPUT" = "ON" ] && sleep 0.2 && jack_connect system:capture_1 jackmixer:in1_left && jack_connect system:capture_2 jackmixer:in1_right
 		;;
 
-		vol-jack-bf)
+		jack-bf)
 			systemctl "$ACTION" jackd.service
-			[ "$ACTION" = "start" ] && until jack_lsp ; do sleep 0.1 ; done
+			until jack_lsp | grep jackmixer ; do sleep 0.1 ; done
 			systemctl "$ACTION" brutefir.service
 			until jack_lsp | grep brutefir ; do sleep 0.2 ; done
-			[[ "$JACKBF_NETJACK"      = "ON"  && "$ACTION" != "stop" ]] && jack_load netmanager
+			[[ "$JACKBF_NETJACK"      = "ON"  && "$ACTION" != "stop" ]] && jack_load netmanager && connect_netjackports
 			[ "$JACKBF_SQUEEZELITE"   = "ON" ] && systemctl "$ACTION" squeezelite.service
 			[ "$JACKBF_GMEDIARENDER"  = "ON" ] && systemctl "$ACTION" gmediarender.service
 			[ "$JACKBF_SHAIRPORTSYNC" = "ON" ] && systemctl "$ACTION" shairport-sync.service
-			[ "$JACKBF_BLUEALSAAPLAY" = "ON" ] && systemctl "$ACTION" bluealsa-aplay.service
+			[[ "$JACKBF_BLUEALSAAPLAY" = "ON" && -e /sys/class/bluetooth/hci0 ]] && systemctl "$ACTION" bluealsa-aplay.service
 			[ "$JACKBF_INPUT" = "ON" ] && sleep 0.2 && jack_connect system:capture_1 brutefir:input-0 && jack_connect system:capture_2 brutefir:input-1
 		;;
 
-		vol-jack-bfms)
+		jack-bfms)
 			systemctl "$ACTION" jackd.service
-			[ "$ACTION" = "start" ] && until jack_lsp ; do sleep 0.1 ; done
+			until jack_lsp | grep jackmixer ; do sleep 0.1 ; done
 			systemctl "$ACTION" brutefir.service
 			until jack_lsp | grep brutefir ; do sleep 0.2 ; done
-			[[ "$JACKBFMS_NETJACK"      = "ON"  && "$ACTION" != "stop" ]] && jack_load netmanager
+			[[ "$JACKBFMS_NETJACK"      = "ON"  && "$ACTION" != "stop" ]] && jack_load netmanager && connect_netjackports
 			[ "$JACKBFMS_SQUEEZELITE"   = "ON" ] && systemctl "$ACTION" squeezelite.service
 			[ "$JACKBFMS_GMEDIARENDER"  = "ON" ] && systemctl "$ACTION" gmediarender.service
 			[ "$JACKBFMS_SHAIRPORTSYNC" = "ON" ] && systemctl "$ACTION" shairport-sync.service
-			[ "$JACKBFMS_BLUEALSAAPLAY" = "ON" ] && systemctl "$ACTION" bluealsa-aplay.service
+			[[ "$JACKBF_BLUEALSAAPLAY" = "ON" && -e /sys/class/bluetooth/hci0 ]] && systemctl "$ACTION" bluealsa-aplay.service
 			[ "$JACKBFMS_INPUT" = "ON" ] && jack_connect system:capture_1 brutefir:input-0 && jack_connect system:capture_2 brutefir:input-1
 		;;
 	esac
@@ -121,18 +127,33 @@ sed -i "/#SAMPLINGRATE/c\        rate "$RATE" #SAMPLINGRATE" /etc/asound.conf
 
 function StopStatus()
 {
+	[ "$1" = "stop" ] && volumecontrol -120 && sleep 0.5 && killall jack_persistent_client
 	for SERVICE in squeezelite gmediarender shairport-sync bluealsa-aplay brutefir jackd
 	do
 		systemctl "$1" "$SERVICE".service
 	done
 }
 
-function Measure()
+function Brutefir()
 {
 	for SERVICE in squeezelite gmediarender shairport-sync bluealsa-aplay
 	do
-		systemctl "$1" "$SERVICE".service
+		systemctl stop "$SERVICE".service
 	done
+	systemctl start jackd.service
+	until jack_lsp | grep jackmixer ; do sleep 0.1 ; done
+	systemctl start brutefir.service
+	until jack_lsp | grep brutefir ; do sleep 0.2 ; done
+}
+
+function Jack()
+{
+	for SERVICE in squeezelite gmediarender shairport-sync bluealsa-aplay
+	do
+		systemctl stop "$SERVICE".service
+	done
+	systemctl start jackd.service
+	until jack_lsp | grep jackmixer ; do sleep 0.1 ; done
 }
 
 case "$ACTION" in
@@ -149,8 +170,12 @@ case "$ACTION" in
 	Start
 	;;
 
-	measure)
-	Measure stop
+	brutefir)
+	Brutefir
+	;;
+
+	jack)
+	Jack
 	;;
 esac
 

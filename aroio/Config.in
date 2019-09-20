@@ -98,11 +98,18 @@ menu "Perl CPAN Packages"
 endmenu
 
 
+source "$BR2_EXTERNAL_aroio_PATH/package/logsweep/Config.in"
+source "$BR2_EXTERNAL_aroio_PATH/package/filter/Config.in"
 source "$BR2_EXTERNAL_aroio_PATH/package/ladspa/Config.in"
+source "$BR2_EXTERNAL_aroio_PATH/package/ldacbt/Config.in"
 source "$BR2_EXTERNAL_aroio_PATH/package/bluez-alsa/Config.in"
 source "$BR2_EXTERNAL_aroio_PATH/package/alsa-plugins/Config.in"
+source "$BR2_EXTERNAL_aroio_PATH/package/alsacap/Config.in"
 source "$BR2_EXTERNAL_aroio_PATH/package/ng-jackspa/Config.in"
 source "$BR2_EXTERNAL_aroio_PATH/package/slimserver/Config.in"
 source "$BR2_EXTERNAL_aroio_PATH/package/squeezelite-jack/Config.in"
 source "$BR2_EXTERNAL_aroio_PATH/package/fftw3f/Config.in"
 source "$BR2_EXTERNAL_aroio_PATH/package/brutefir/Config.in"
+source "$BR2_EXTERNAL_aroio_PATH/package/jack-connect-persistent/Config.in"
+source "$BR2_EXTERNAL_aroio_PATH/package/jack_minimix/Config.in"
+source "$BR2_EXTERNAL_aroio_PATH/package/rtl8812au/Config.in" 

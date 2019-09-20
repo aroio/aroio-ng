@@ -2,8 +2,13 @@
 
 . /boot/userconfig.txt
 
+rm /etc/systemd/network/*
+
+[ "$WLANSSID" = "AroioAP" ] && echo "AP-Mode" && exit 0
+
 if [ "$LAN_DHCP" = "OFF" ]
 then
+	echo "Writing network configuration file for wired network with fixed adresses..."
 	cat <<-EOF > /etc/systemd/network/20-wired.network
 	[Match]
 	Name=eth0
@@ -19,6 +24,7 @@ then
 	EOF
 
 else
+	echo "Writing network configuration file for wired network with DHCP..."
 	cat <<-EOF > /etc/systemd/network/20-wired.network
 	[Match]
 	Name=eth0
@@ -27,14 +33,22 @@ else
 	DHCP=ipv4
 
 	[DHCP]
+	ClientIdentifier=mac
 	RouteMetric=10
+	UseNTP=false
 	EOF
 fi
 
-if [[ "$WLANSSID" != "" && "$WLANSSID" != "WIFI-OFF!" ]]
+echo "DEBUG!"
+echo "WLANSSID = "$WLANSSID""
+echo $(ls /sys/class/net/wlan0)
+
+if [[ "$WLANSSID" != "" && "$WLANSSID" != "WIFI-OFF!" ]] && [ -e /sys/class/net/wlan0 ]
 then
+	echo "WLAN SSID is neither empty nor \"WIFI-OFF\"."
 	if [ "WLAN_DHCP" = "OFF" ]
 	then
+		echo "Writing network configuration file for WiFi network with fixed adresses..."
 		cat <<-EOF > /etc/systemd/network/25-wireless.network
 		[Match]
 		Name=wlan0
@@ -48,17 +62,20 @@ then
 		Metric=20
 		Gateway=$WLAN_GATEWAY
 		EOF
+	else
+		echo "Writing network configuration file for WiFi network with DHCP..."
+		cat <<-EOF > /etc/systemd/network/25-wireless.network
+		[Match]
+		Name=wlan0
+
+		[Network]
+		DHCP=ipv4
+
+		[DHCP]
+		ClientIdentifier=mac
+		RouteMetric=20
+		UseNTP=false
+		EOF
 	fi
-else
-	cat <<-EOF > /etc/systemd/network/25-wireless.network
-	[Match]
-	Name=wlan0
-
-	[Network]
-	DHCP=ipv4
-
-	[DHCP]
-	RouteMetric=20
-	EOF
+else echo "WLAN SSID is either empty or \"WIFI-OFF\", will not write a configuration for it."
 fi
-

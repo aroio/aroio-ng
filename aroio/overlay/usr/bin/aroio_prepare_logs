@@ -1,0 +1,53 @@
+#!/bin/sh
+
+[ -e /tmp/aroio_logs ] && rm -rf /tmp/aroio_logs/*
+mkdir -p /tmp/aroio_logs/logs /tmp/aroio_logs/config
+[ -e /opt/www/aroio_logs.7z ] && rm /opt/www/aroio_logs.7z
+
+# copy userconfig to logs and clear WiFi password
+cp /boot/userconfig.txt /tmp/aroio_logs/config/
+sed -i "/WLANPWD/c\WLANPWD=\"\"" /tmp/aroio_logs/config/userconfig.txt
+sed -i "/SQUEEZEPWD/c\SQUEEZEPWD=\"\"" /tmp/aroio_logs/config/userconfig.txt
+sed -i "/USERPASSWD/c\USERPASSWD=\"\"" /tmp/aroio_logs/config/userconfig.txt
+
+# copy config.txt to logs
+cp /boot/config.txt /tmp/aroio_logs/config/
+
+# Create list of convolution filters
+echo "Filters on SDCard:" > /tmp/aroio_logs/config/filters.txt
+ls /boot/filter/ >> /tmp/aroio_logs/config/filters.txt
+echo -e "\nFilters in tmp:" >> /tmp/aroio_logs/config/filters.txt
+ls /run/filter/ >> /tmp/aroio_logs/config/filters.txt
+
+# Collect version information
+echo -e "Aroio version: $(head -n1 /boot/version)\nRaspberry $(aroio_piversion)" > /tmp/aroio_logs/config/versions.txt
+cat /boot/version | tail -2 >> /tmp/aroio_logs/config/versions.txt
+
+# Collect module information
+lsmod > /tmp/aroio_logs/config/loaded_modules.txt
+
+# Save output of ifconfig
+echo -e "ifconfig -a output:" > /tmp/aroio_logs/config/network.txt
+ifconfig -a >> /tmp/aroio_logs/config/network.txt
+echo -e "\n\niwconfig output:" >> /tmp/aroio_logs/config/network.txt
+iwconfig >> /tmp/aroio_logs/config/network.txt
+
+# Store information about audio-hardware
+controlaudio stop
+echo -e "cat /proc/asound/cards:" > /tmp/aroio_logs/config/audio_hw.txt
+cat /proc/asound/cards >> /tmp/aroio_logs/config/audio_hw.txt
+echo -e "aplay --dump-hw-params:" >> /tmp/aroio_logs/config/audio_hw.txt
+aplay --duration=1 -Dhw:0 --dump-hw-params /dev/zero >> /tmp/aroio_logs/config/audio_hw.txt 2>&1
+
+# Collect mostly needed logs
+for SERVICE in brutefir squeezelite jackd bluealsa-aplay gmediarender jackminimix shairport-sync
+do
+	journalctl -u $SERVICE > /tmp/aroio_logs/logs/"$SERVICE".log.txt
+done
+
+# Create archive for download
+7zr a -t7z -m0=LZMA2:d64k:fb32 -ms=8m -mmt=8 -mx=1 -- /opt/www/aroio_logs.7z /tmp/aroio_logs/logs /run/log/journal /tmp/aroio_logs/config/*
+
+controlaudio start
+
+exit 0

@@ -1,6 +1,13 @@
 <?php
 include('strings.php');
 
+function deliver_logs()
+{
+    exec('aroio_prepare_logs');
+    header("Location: " . "http://" . $_SERVER['HTTP_HOST'] . '/getlogs.php');
+	die();
+}
+
 function scanwifi()
 {
 	$wifiscan=exec('ifconfig wlan0 up && iwlist scan 2>/dev/null | sed \'s/\"//g\' | awk -F":" \'/ESSID/{print $2}\' | sort -f  ',$wifilist);
@@ -137,6 +144,16 @@ function test_wlan()
 	return $return_val;
 }
 
+function test_bt()
+{
+  if (!file_exists("/sys/class/bluetooth/hci0")) print "disabled";
+}
+
+function test_input()
+{
+  if (!file_exists("/proc/asound/card0/pcm0c")) print "disabled";
+}
+
 function restart_lms()
 {
 	shell_exec('killall startstreamer.sh');
@@ -145,11 +162,7 @@ function restart_lms()
 	shell_exec('/usr/bin/startstreamer.sh &> /dev/null &');
 }
 
-function cancel_measurement()
-{
-	shell_exec('killall aplay');
-	shell_exec('killall arecord');
-}
+
 
 //HTML-Functions
 
@@ -197,7 +210,7 @@ function print_optgroup2D($name,$arr_values,$sel_value)
 function fltrSelect($id,$ini_array)
 {
 	//$directory = '/home/sftparoio'; //evtl als konstante bzw in config-file
-	$directory = '/tmp/filter'; //evtl als konstante bzw in config-file
+	$directory = '/run/filter'; //evtl als konstante bzw in config-file
 	if ($regexString=browseDirectory($directory)) {
 	    /*while(false !== ($entry = readdir($handle)))
 	    {
@@ -205,19 +218,22 @@ function fltrSelect($id,$ini_array)
 	    }
 	    closedir($handle);*/
 
-		$pattern = "/(\\w*)L|R(\\d*).dbl/";
+		$rate=(int)($ini_array[RATE] / 1000);
+		//$pattern = "/(\\w*)L|R(\\d*).dbl/";
+		$pattern = "/(\\w*)(L|R)".$rate.".dbl/";
 
 		//check if surround
 		if ($ini_array[CHANNELS]==4) {
-			$pattern = "/(\\w*)SL|R(\\d*).dbl/";
+			$pattern = "/(\\w*)S(L|R)".$rate.".dbl/";
 		}
 
 		preg_match_all($pattern, $regexString,$banks); // in $banks[1] Coeffset-Name
+		$result = array_unique($banks[1]);
 		$out='<select class="filter" name="coeff'.$id.'">';
 		if($ini_array[COEFF_NAME.$id]!="" || !empty($ini_array[COEFF_NAME.$id]))$out .= '<option selected>'.$ini_array[COEFF_NAME.$id].'</option>';
 		else $out.= '<option selected>BypassFilter</option>';
-		for ($i=0; $i < count($banks[1]); $i++) {
-			if(!empty($banks[1][$i])) $out.='<option>'.$banks[1][$i].'</option>';
+		foreach ($result as &$option) {
+			$out.='<option>'.$option.'</option>';
 		}
 		$out.='</select>';
 		return $out;
@@ -298,15 +314,14 @@ function print_audio_hw_params()
 }
 
 
-
 //Gibt die korrekte Squeezebox Adresse aus
-
 function print_squeezeaddr($port)
 {
 	if ($port=="") $port="9000";
 	$out = exec("netstat -n -t | grep -o -E '\b([0-9]{1,3}\.){3}[0-9]{1,3}\b':3483 | grep -oE '\b([0-9]{1,3}\.){3}[0-9]{1,3}\b'");
 	return $out .= ":".$port;
 }
+
 
 // PHP aktiver Filter für Filterset
 function activeFilter()
@@ -321,6 +336,8 @@ function activeFilter()
 		return $activeFilter = getFilter();
 	}
 }
+
+
 //Filter-Control
 function print_filterset($count,$ini_array)
 {
@@ -457,23 +474,24 @@ function readCoeffNamesFromBrutefir($sets)
 function switchFilter($fltrBank)
 {
 	$cmd = '/usr/bin/controlbrutefir chgFilter'; //evtl als konstante auslagern
-	$directory = '/tmp/filter';
+	$directory = '/run/filter';
 	$coeffSet0=2*$fltrBank;
 	$coeffSet1=2*$fltrBank+1;
 	$coeffSet2=2*$fltrBank+2;
 	$coeffSet3=2*$fltrBank+3;
 
- 	//Channel 0
-	shell_exec($cmd.' 0 '.$coeffSet0);
-	//Channel 1
-	shell_exec($cmd.' 1 '.$coeffSet1);
-	if ($regexString=browseDirectory($directory)) {
+	$ch_1=" 0 ";
+	$ch_2=" 1 ";
+	shell_exec($cmd.$ch_1.$coeffSet0.$ch_2.$coeffSet1);
+
+/*	if ($regexString=browseDirectory($directory)) {
 		$pattern = "/".$fltrBank."S[L]|[R](\\d*).dbl/";
 		if(preg_match_all($pattern, $regexString)>0){
 			shell_exec($cmd.' 2 '.$coeffSet2);
 			shell_exec($cmd.' 3 '.$coeffSet3);
 		}
 	}
+*/
 }
 
 //returns active filter set
@@ -533,7 +551,7 @@ function isMuted()
 
 }
 
-function volControl($ms,$attenuation)
+function volControl()
 {
 	$cmd = '/usr/bin/controlbrutefir volControl '.$ms.' '.$attenuation;
 	shell_exec($cmd);
@@ -542,7 +560,18 @@ function volControl($ms,$attenuation)
 
 function measurement()
 {
-	$cmd='/usr/bin/recordsweep 2>&1';
+	while (exec('pgrep controlaudio'))
+	{
+		sleep(1);
+	}
+
+	if($_POST['MEASURE_MS'] == "ON") $ms="ms_on";
+	else $ms="ms_off";
+	
+	if(isset($_POST['MEASUREMENT_CONTROL'])) $control="control_on";
+	else $control="control_off";
+
+	$cmd="/usr/bin/recordsweep $ms $control 2>&1";
 
 	while (@ ob_end_flush()); // end all output buffers if any
 
@@ -554,7 +583,59 @@ function measurement()
 	    @ flush();
 	}
     echo '</pre>' ;
+}
 
+
+function cancel_measurement()
+{
+	exec('rm /tmp/measurement');
+	//exec('pkill -P $(pgrep -o recordsweep_)');
+	exec('killall aplay');
+	exec('killall arecord');
+	while (exec('pgrep controlaudio'))
+	{
+		sleep(1);
+	}
+	exec('controlaudio stop');
+	exec('controlaudio start');
+	echo '<pre>';
+	echo 'Measurement cancelled.';
+	echo '</pre>';
+}
+
+
+function play_noise($ms)
+{
+	shell_exec("record_checkvolume '$ms' &> /dev/null &");
+}
+
+
+function stop_noise()
+{
+	shell_exec('killall aplay');
+	shell_exec('controlaudio start');
+}
+
+
+function update($beta)
+{
+	if ($beta == "beta")
+	{
+		$cmd='/usr/bin/update -m -u beta 2>&1';
+	}
+	else
+	{
+		$cmd='/usr/bin/update -m -u beta 2>&1';
+	}
+	while (@ ob_end_flush()); // end all output buffers if any
+		$proc = popen($cmd, 'r');
+		echo '<pre>' ;
+		while (!feof($proc))
+		{
+			echo fread($proc, 4096);
+			@ flush();
+		}
+    		echo '</pre>' ;
 }
 
 function upload_measurement()

@@ -22,7 +22,6 @@
     $off_en='off';
     $off_de='aus';
 
-
 //Konfiguration
     //Netzwerkeinstellungen
         //
@@ -130,8 +129,8 @@
     $squeeze_serv_passwd_en='Password (if set)';
     $squeeze_serv_passwd_de='Passwort (falls gesetzt)';
 
-    $squeeze_serv_port_en='Port (default is 3483)';
-    $squeeze_serv_port_de='Port (Standard ist 3483)';
+    $squeeze_serv_port_en='Port (default is 9000)';
+    $squeeze_serv_port_de='Port (Standard ist 9000)';
         //HELPTEXT
     $helptext_servername_en='Here you enter the name or address of the LM-server you want to connect to. If this field stays blank, the network will be scanned for a server. If the server is the device itself, you can enter either localhost, the ip-address of the device or 127.0.0.1.';
     $helptext_servername_de='Eingabefeld f&uuml;r Namen oder Adresse des LM-Servers, der verwendet werden soll. Wird das Feld leer gelassen, wird das Netzwerk automatisch nach einem Server gescannt. L&auml;uft der Server auf dem Ger&auml;t selber, kann hier entweder localhost, die IP-Adresse des Ger&auml;tes oder 127.0.0.1 eingetragen werden.';
@@ -142,8 +141,8 @@
     $helptext_squeezepwd_en='If you enabled security with username and password on your LM-server, you enter the password to be used here.';
     $helptext_squeezepwd_de='Sofern der LM-Server auf Abfrage von Benutzernamen und Passwort konfiguriert ist, ist das Passwort hier einzutragen.';
 
-    $helptext_serverport_en='If you set up you LM-server to use a non-standard port (which is 9000), you enter this number right here. If you leave the field blank, the default-port will be used.';
-    $helptext_serverport_de='Sollte der LM-Server auf einen vom Standard-Port abweichenden Port konfiguriert sein (Standard ist 9000), diesen bitte hier eintragen. Bleibt das Feld leer, wird der Standard-Port verwendet.';
+    $helptext_serverport_en='If you set up you LM-server to use a non-standard port for its webinterface (some NAS use 9001 or 9002), you enter this number right here. If you leave the field blank, the default-port will be used.';
+    $helptext_serverport_de='Sollte der LM-Server auf einen vom Standard-Port abweichenden Port konfiguriert sein (einige NAS nutzen 9001 oder 9002), diesen bitte hier eintragen. Bleibt das Feld leer, wird der Standard-Port verwendet.';
     //Audio-Einstellungen
         //
     $audio_form_en='Audio settings';
@@ -151,6 +150,12 @@
 
     $player_name_en='Audio player name';
     $player_name_de='Audioplayer Name';
+
+    $advancedsettings_de='Erweiterte Einstellungen';
+    $advancedsettings_en='Advanced settings';
+
+    $display_rotate_de='Bildschirm drehen';
+    $display_rotate_en='Rotate display';
 
     $mscoded_en='AudioVero Clean!<br>(digital part only)';
     $mscoded_de='AudioVero Clean!<br>(nur digitale Seite)';
@@ -167,8 +172,8 @@
     $squeezelite_only_en='none';
     $squeezelite_only_de='keiner';
 
-    $squeezelite_and_upnp_en='UPNP player';
-    $squeezelite_and_upnp_de='UPNP-Player';
+    $squeezelite_and_upnp_en='UPnP player';
+    $squeezelite_and_upnp_de='UPnP-Player';
 
     $squeezelite_and_netjack_en='netjack';
     $squeezelite_and_netjack_de='Netjack';
@@ -185,8 +190,8 @@
     $audioplayer_squeezelite_en='Squeezelite' ;
     $audioplayer_squeezelite_de='Squeezelite' ;
 
-    $audioplayer_gmediarender_en='UPNP-Player' ;
-    $audioplayer_gmediarender_de='UPNP-Player' ;
+    $audioplayer_gmediarender_en='UPnP-Player' ;
+    $audioplayer_gmediarender_de='UPnP-Player' ;
 
     $convolution_volcontrol_en='Volume Control';
     $convolution_volcontrol_de='Lautst&auml;rkeanpassung';
@@ -200,8 +205,11 @@
     $jack_period_en='Jack period size';
     $jack_period_de='Jack Periodengr&ouml;&szlig;e';
 
-    $squeeze_alsabuffer_en='Squeezelite ALSA buffer size';
-    $squeeze_alsabuffer_de='Squeezelite ALSA Puffergrö&szlig;e';
+    $squeeze_maxfrequency_en='LMS max. frequency';
+    $squeeze_maxfrequency_de='LMS max. Frequenz';
+
+    $helptext_squeeze_maxfrequency_en='Highest frequency that LMS will output without its own resampling. You can use this to force server-side resampling.';
+    $helptext_squeeze_maxfrequency_de='Maximal von LMS ausgegebene Frequenz, da&uuml;ber wird seitens LMS geresampelt. Hiermit wird serverseitiges Resampling erzwungen.';
 
     $squeeze_alsaperiod_en='Squeezelite ALSA period number';
     $squeeze_alsaperiod_de='Squeezelite ALSA Periodenanzahl';
@@ -212,12 +220,24 @@
     $squeeze_outbuffer_en='Squeezelite output buffer size';
     $squeeze_outbuffer_de='Squeezelite Ausgabe-Puffergr&ouml;&szlig;e';
 
+    $sp_outbuffer_en='ShAirPlay output buffer size';
+    $sp_outbuffer_de='ShAirPlay Ausgabe-Puffergr&ouml;&szlig;e';
+
+    $sp_samplerate_en='ShAirPlay samplerate';
+    $sp_samplerate_de='ShAirPlay Samplingfrequenz';
+
     $bf_partitions_en='BruteFIR partitions';
     $bf_partitions_de='BruteFIR Partitionen';
 
     $soundcard_en='Audio card';
     $soundcard_de='Soundkarte';
+
+    $samplerate_en='Samplerate';
+    $samplerate_de='Sampling-Frequenz';
         //HELPTEXT
+    $helptext_advancedsettings_en='Advanced settings. Only use when needed or asked to do so by ABACUS!';
+    $helptext_advancedsettings_de='Erweiterte Einstellungen. Nur benutzen, wenn ben&ouml;tigt oder von ABACUS dazu aufgefordert!';
+
     $helptext_playername_en='Here you enter the desired name for the audio players. If you leave this field empty, the hostname will be used.';
     $helptext_playername_de='Gew&uuml;nschter Name der Audio-Player. Bleibt dieses Feld leer, wird der Rechnername (Hostname) verwendet.';
 
@@ -229,6 +249,15 @@
 
     $helptext_audioplayer_en='Selection of the audio-player. Without convolution the sampling frequency of the D/A converter follows the audio input. Therefore only one audio player can be active at a time. With enabled convolution the audio is resampled, which enables the use of multiple players simultaniously. Netjack can be used to output the audio of an openelec media center through Aroio by using the netjack-plugin. Openelec can compensate the large delay introduced by the convolution.' ;
     $helptext_audioplayer_de='Auswahl der Audio-Players. Ohne Convolution folgt die Samplingfrequenz des D/A-Wandlers dem Audio-Material. Daher kann immer nur ein Audio-Player aktiv sein. Mit aktivierter Convolution wird das Audio-Signal geresampled, so dass mehrere Player parallel laufen &ouml;nnen, allerdings nicht uneingeschr&auml;nkt. Netjack eignet sich hervorragend, um die Audio-Ausgabe eines Openelec Media-Centers auf Aroio erfolgen zu lassen. Dies ben&ouml;tigt das Netjack-Plugin. Openelec ist in der Lage, die Audio-Verz&ouml;gerung, die die Convolution mit sich bringt, auszugleichen.' ;
+
+    $helptext_soundcard_en='Selection of the installed audio card. A chenge here requires restarting the system.';
+    $helptext_soundcard_de='Auswahl der verwendeten Soundkarte. Eine &Auml;nderung erfordert einen Neustart.';
+
+    $helptext_samplerate_en='Selection of the system samplerate. Does not ally for the mode \'Direct\'';
+    $helptext_samplerate_de='Auswahl der System-Sampling-Frequenz. Bezieht sich nicht auf den Modus \'Direct\'';
+
+    $helptext_display_rotate_en='Rotation of the HDMI output signal for 90°';
+    $helptext_display_rotate_de='Drehung des an den HDMI-Ausgangssignals um 90°';
 
     $helptext_alsaoutbuff_en='Output buffer size of the Squeezeplayer. Only change this, if you know what you are doing!';
     $helptext_alsaoutbuff_de='Ausgangs-Puffergr&ouml;&szlig;e des Squeeze-Players. Diesen Wert nicht leichtfertig &auml;ndern!';
@@ -254,8 +283,8 @@
     $helptext_volume_en="Startup output Volume of the device in dB.";
     $helptext_volume_de="Start-Ausgabelautst&auml;rke des Ger&auml;tes in dB";
 
-    $helptext_jack_buffer_en='Selection of the jack buffer size. The recommended default value is 2048.';
-    $helptext_jack_buffer_de='Auswahl der Jack Puffer-Gr&ouml;&szlig;e. Standardm&auml;&szlig;ig wird hier der Wert 2048 empfohlen.';
+    $helptext_jack_buffer_en='Selection of the jack buffer size.';
+    $helptext_jack_buffer_de='Auswahl der Jack Puffer-Gr&ouml;&szlig;e.';
 
     $helptext_jack_period_en='Selection of the jack period size. The recommended default value for USB cards is 3.';
     $helptext_jack_period_de='Auswahl der Jack Periodengr&ouml;&szlig;e. F&uuml;r USB Interfaces wird der Wert 3 empfohlen.';
@@ -275,12 +304,37 @@
     $helptext_bf_partitions_en='Number of BruteFIR partitions to process in parallel.';
     $helptext_bf_partitions_de='Anzahl parallel abzuarbeitender BruteFIR Partitionen.';
 
+    $helptext_sp_outbuffer_en='Size of the shairplay buffer.';
+    $helptext_sp_outbuffer_de='Gr&ouml;&szlig;e des Shairplay-Puffers.';
+
+    $helptext_sp_samplerate_en='Target samplingrate of the ShAirPlay module.';
+    $helptext_sp_samplerate_de='Ziel Resamplingfrequenz des ShAirPlay Moduls.';
 
     $helptext_showpwd_en='Show WLAN key.';
     $helptext_showpwd_de='WLAN-Schlüssel anzeigen';
 
-    $helptext_soundcard_en='Selection of the installed audio card. A chenge here requires restarting the system.';
-    $helptext_soundcard_de='Auswahl der verwendeten Soundkarte. Eine &Auml;nderung erfordert einen Neustart.';
+    //Audio_matrix
+    $helptext_audio_out_direct_en='Direct output mode: The samplingrate of the DAC follows the Audio-Stream. If the DAC does not support the rate, the signal will be resampled.';
+    $helptext_audio_out_direct_de='Direkter Ausgabemodus: Die Samplingfrequenz der Wandler folgt dem zugespielten Musiksignal, es sei denn, die Wandler beherrschen diese nicht, dann wird geresampelt.';
+
+    $helptext_audio_out_direct_ms_en='Same as \'Direct\' but with MS-coding.';
+    $helptext_audio_out_direct_ms_de='Wie \'Direct\', zus&auml;tzlich mit MS-Kodierung.';
+
+    $helptext_audio_out_bus_en='Bus mode: All audio signal are being routed to a bus (jackd). Multiple players can be used simultaniously. Fixed sampling rate. If other rates than the selected target rate are played, the signal will be resampled';
+    $helptext_audio_out_bus_de='Bus-Modus: S&auml;mtliche Audio-Signale laufen auf einem Bus (jackd) zusammen. Es k&ouml;nnen mehrere Player gleichzeitig aktiv sein. Feste Samplingfrequenz mit Resampling, wenn andere Raten als die eingestellte zugespielt werden.';
+
+    $helptext_audio_out_bus_ms_en='Same as \'Bus\' but with MS-coding.';
+    $helptext_audio_out_bus_ms_de='Wie \'Bus\', zus&auml;tzlich mit MS-Kodierung.';
+
+    $helptext_audio_out_convol_en='Convolution mode: Bus mode with convolution.';
+    $helptext_audio_out_convol_de='Convolution Modus: Bus-Modus mit anschlie&szlig;ender Convolution.';
+
+    $helptext_audio_out_convol_ms_en='Same as \'Convolution\', but with MS-coding.';
+    $helptext_audio_out_convol_ms_de='Wie \'Convolution\', zus&auml;tzlich mit MS-Kodierung.';
+
+    $helptext_audio_out_en='';
+    $helptext_audio_out_de='';
+
     //Button
     $button_submit_audiosettings_de='Anwenden';
     $button_submit_audiosettings_en='Apply';
@@ -326,14 +380,17 @@
     $local_version_en='Installed version: ';
     $local_version_de='Installierte Version: ';
 
-    $remote_version_en='Remotely available version: ';
-    $remote_version_de='Verf&uuml;gbare Version: ';
+    $remote_version_en='Available version: ';
+    $remote_version_de='Verfügbare Version: ';
 
     $button_update_en='Update';
     $button_update_de='Update';
 
+    $infotext_update_ack_en='This version can be installed under \'System\'.\nThis message will not be shown again until the next release of a version.';
+    $infotext_update_ack_de='Diese Version kann unter \'System\' installiert werden.\nDiese Meldung wird bis zum Erscheinen einer neuen Version nicht wieder angezeigt!';
+
     $infotext_update_available_en='There is a newer Aroio-version available!';
-    $infotext_update_available_de='Es ist eine neuere Aroio-Version verf&uuml;gbar!';
+    $infotext_update_available_de='Es ist eine neuere Aroio-Version verfügbar!';
 
     $infotext_update_unchanged_en='There is no newer Version available at the moment, but you may still install the last version found.';
     $infotext_update_unchanged_de='Es ist derzeit keine neuere Version verf&uuml;gbar. <br>Es kann aber die letzte verf&uuml;gbare Version erneut installiert werden.';
@@ -392,8 +449,8 @@
     $button_mount_en='File systems';
     $button_mount_de='Dateisysteme';
 
-    $button_free_en='Memory usage';
-    $button_free_de='Speicher-Verbrauch';
+    $button_deliver_log_en='Download logs';
+    $button_deliver_log_de='Download Logs';
     //HELPTEXT
     $helptext_beta_de='Ist dieses Feld gesetzt, wird ausschliesslich nach verf&uuml;gbaren Entwicklungsversionen gesucht. Diese enthalten neue Features oder Korrekturen f&uuml;r bekannte Fehler, sind aber noch in Entwicklung und somit nicht offiziell freigegeben. F&uuml;r Experimentierfreudige und Unerschrockene.';
     $helptext_beta_en='If set, Aroio will look excusively for development versions. These may contain new features or fixes for known bugs, but are still under development and not officially released and supported. For the unafraid or adventurous... ';
@@ -409,15 +466,25 @@
     $measurement_form_en='Room Correction Measurement';
     $measurement_form_de='Raumkorrekturmessung';
 
-    $measurement_warning_en='For the measurement you need a <a class="forward" href="https://www.abacus-electronics.de/produkte/streaming/raumkorrektur/minidsp-umik-1.html" title="UMIK-1 ABACUS-Shop" target="_blank">miniDSP UMIK-1</a> USB measurement microphone. The mic has to be connected to one of the USBs on the Aroio. <p> After clicking [Measure] the stimulus is loaded. This takes several seconds when done for the first time. Afterwards, all frequencies are put out from low to high, once left, right and left again.</p>
-    <p>For a good measurement the volume should be adjusted such that the level is high enough but the speakers should not reach mechanical limits (especially at low frequencies). Start the measurement with low level first. Click [Cancel], increase the volume and start it again. Repeat this until the level is good. Now let the measurement proceed without changing volume (this take about 3 minutes).</p>';
+    $measurement_warning_en='For the measurement a <a class="forward" href="https://www.abacus-electronics.de/produkte/streaming/raumkorrektur/minidsp-umik-1.html" title="UMIK-1 ABACUS-Shop" target="_blank">miniDSP UMIK-1</a> USB measurement microphone is needed.
+    The mic has to be set up at the listening position and connected to one of the USB ports on the Aroio.
+    <p><button type="button" style="padding: 4px 2px; margin: 0px;">Measurement</button> loads the stimulus and plays all audio frequencies from low to high, once left, once right and left again.</p>
+    <p>For a good measurement the volume should be adjusted such that the level is high enough but the speakers should not reach mechanical limits (especially at low frequencies).</p>
+    <button type="button" style="padding: 4px 2px; margin: 0px;">Volume test</button> Will play a 10 second noise for volume setting. The volume should be set that is is still pleasant and not powerfull.</p>
+    Now let the measurement proceed without changing the volume.</p>
+    <p><button type="button" style="padding: 4px 2px; margin: 0px;">Control measurement</button> starts a measurement through the convolver with its filters set in the convolver tab.
+    This is independent of the output mode set under the system tab. This can be used to control generated filters.</p>';
 
-    $measurement_warning_de='Zur Messung wird ein <a class="forward" href="https://www.abacus-electronics.de/produkte/streaming/raumkorrektur/minidsp-umik-1.html" title="UMIK-1 ABACUS-Shop" target="_blank">miniDSP UMIK-1</a> USB-Messmikrofon ben&ouml;tigt. Das Mikrofon wird an der H&ouml;rposition aufgestellt und an einem der USB-Anschl&uuml;sse am Aroio angeschlossen. <p>Nach Klick auf <button type="button" style="padding: 4px 2px; margin: 0px;">Messung</button> wird das Messsignal geladen. Das dauert beim ersten Mal einige Sekunden. Danach durchl&auml;uft das Signal alle Frequenzen von tief bis hoch einmal links, einmal rechts und noch einmal links.</p>
-    <p>F&uuml;r eine optimale Messung sollte eine Lautst&auml;rke eingestellt werden, dass der Pegel ausreichend hoch ist, ohne dass die Lautsprecher (vor allem im Bass) mechanisch an Grenzen sto&szlig;en.
-    Starten Sie die Messung zun&auml;chst mit einer geringen Lautst&auml;rke. Klicken Sie auf <button type="button" style="padding: 4px 2px; margin: 0px;">Abbruch</button>, erh&ouml;hen Sie sie und starten Sie die Messung erneut. Das wiederholen Sie bis der Pegel stimmt. Lassen Sie dann die Messung komplett durchlaufen ohne die Lautst&auml;rke zu &auml;ndern (dauert ca. 3 Minuten).</p>';
 
-    //$measurement_buffer_warning_de='Der Jack-Puffer muss f&uuml;r zuverl&auml;ssige Messungen auf 8192 KB eingestellt sein. Bitte im Reiter Konfiguration korrigieren.';
-    //$measurement_buffer_warning_en='The jack buffer needs to be set to 8192 KB in order to achieve best measurement performance. Please adjust it accordingly in the configuration tab.';
+    $measurement_warning_de='Zur Messung wird ein <a class="forward" href="https://www.abacus-electronics.de/produkte/streaming/raumkorrektur/minidsp-umik-1.html" title="UMIK-1 ABACUS-Shop" target="_blank">miniDSP UMIK-1</a> USB-Messmikrofon ben&ouml;tigt.
+    Das Mikrofon wird an der H&ouml;rposition aufgestellt und an einem der USB-Anschl&uuml;sse am Aroio angeschlossen.</p>
+    <p><button type="button" style="padding: 4px 2px; margin: 0px;">Messung</button> lädt das Mess-Signal und startet den Messvorgang. Danach durchl&auml;uft das Signal alle Frequenzen von tief bis hoch einmal links, einmal rechts und noch einmal links.</p>
+    <p>Die Lautst&auml;rke sollte so eingestellt werden, das der Pegel ausreichend hoch ist, ohne dass die Lautsprecher (vor allem im Bass) mechanisch an Grenzen sto&szlig;en.</p>
+    <p><button type="button" style="padding: 4px 2px; margin: 0px;">Pegel-Test</button> spielt für 10 Sekunden ein Rauschen ab, das als Orientierung für die Lautstärke der Messung dient. Diese sollte so eingestellt werden, dass sie als angenehm und nicht als kräftig empfunden wird.</p>
+    <p>W&auml;hrend der Messung bitte die Lautstärke nicht ändern.</p>
+    <p><button type="button" style="padding: 4px 2px; margin: 0px;">Kontroll-Messung</button> startet eine Messung durch den Convolver mit den im Reiter Convolver gesetzten Filtern.
+    Dies ist unabhängig von dem im Reiter System ausgewählten Ausgabemodus.
+    Dieser Modus dient der Kontrolle von bestehenden Filtern.</p>';
 
     $measurement_runs_en='Measurement is running. <br> Please wait...';
     $measurement_runs_de='Messung läuft, Signal ertönt links, rechts und nochmals links. <br> Bitte warten... ';
@@ -425,8 +492,23 @@
     $measurement_upload_form_en='Upload measurement';
     $measurement_upload_form_de='Upload der Messung';
 
-    $start_measurement_en='Measure';
+    $play_noise_en='Volume test';
+    $play_noise_de='Pegel-Test';
+
+    $stop_noise_en='Volume test stop';
+    $stop_noise_de='Pegel-Test stop';
+
+    $start_measurement_en='Measurement';
     $start_measurement_de='Messung';
+
+    $start_measurement_control_en='Control measurement';
+    $start_measurement_control_de='Kontroll-Messung';
+
+    $measurement_ms_en='Clean!';
+    $measurement_ms_de='Clean!';
+
+    $measurement_ms_warning_en='If Clean! is selected on the Device, please select here as well!';
+    $measurement_ms_warning_de='Wenn Clean! am Ger&auml;t aktiviert ist, bitte zur Messung ebenfalls aktivieren!';
 
     $cancel_measurement_en='Cancel';
     $cancel_measurement_de='Abbruch';
@@ -597,5 +679,5 @@ $debugging_off_de='aus';
 
 
 $helptext_filter_selection_de="Verwaltung der Filter. Filter k&ouml;nnen mit der Software Acourate von Audiovero direkt auf den AroioEX hochgeladen werden.";
-$helptext_filter_selection_en="Filter management. Filters can be uploaded directly to AroioEX using the Software Acourate by Audiovero."; 
+$helptext_filter_selection_en="Filter management. Filters can be uploaded directly to AroioEX using the Software Acourate by Audiovero.";
 ?>

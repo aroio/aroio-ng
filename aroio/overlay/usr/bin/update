@@ -1,5 +1,7 @@
 #!/bin/sh
 
+. /boot/userconfig.txt
+
 # Execute getopt on the arguments passed
 PARSED_OPTIONS=$(getopt -n "$0"  -o cdhp:mtu:v:x -l "check,download,help,manual,path:,test,update,version:,user:"  -- "$@")
 
@@ -24,8 +26,9 @@ echo "Usage: "$(basename "$0")" [OPTIONS ]
 }
 
 restart(){
-	# wait 5s and reboot the system
-	sleep 5
+	# wait 3s and reboot the system
+	cardmount ro
+	sleep 3
 	reboot
 }
 
@@ -34,14 +37,14 @@ check(){
 	REMOTE_VERSION=$(wget --no-check-certificate -q -O - "$UPDATESERVER"/latest)
 	if $(REMOTE_VERSION=$(wget --no-check-certificate -T 4 -q -O - "$UPDATESERVER"/latest))
 	then
-		LOCAL_VERSION=$(cat /boot/version)
+		LOCAL_VERSION=$(head -n1 /boot/version)
 		echo $REMOTE_VERSION
 		echo $LOCAL_VERSION
 		echo "Remote version is: $REMOTE_VERSION"
 		echo "Local version is:  $LOCAL_VERSION"
 	else
 		echo "Could not find remote version..."
-		cat /boot/version
+		echo "$LOCAL_VERSION"
 	fi
 }
 
@@ -90,10 +93,12 @@ test(){
 }
 
 update(){
+	echo heartbeat >/sys/class/leds/led0/trigger
 	echo "Update started..."
 
 	# Stop daemons that might write to the SDcard before updating
-	#systemctl stop whateverwritestodisk!
+	controlaudio stop
+	systemctl stop brutefir-checkfilters.service
 
 	cd "$USRPATH"
 		[ $? != 0 ] 2>/dev/null && echo "Invalid path given, exiting!" && exit 5
@@ -103,6 +108,7 @@ update(){
 		then
 			echo "There is more than one image in the update folder! Please specify one with the version option."
 			ls aroio*  -lh
+			echo none >/sys/class/leds/led0/trigger
 			exit 2
 	fi
 
@@ -110,11 +116,14 @@ update(){
 	[ "$REMOTE_VERSION" = "" ] && REMOTE_VERSION=$(ls aroio-* | awk -F'[-|.]' {'print $2"."$3'})
 
 	echo "Backing up user configuration"
-		mount -o remount,rw /boot
+		cardmount rw
 		mkdir -p "$USRPATH"/save
 		cd /boot
 		cp -r /boot/userconfig.txt "$USRPATH"/save
 		cp -r /boot/config.txt "$USRPATH"/save
+		grep -q initramfs /"$USRPATH"/save/config.txt  && cardmount rw && sed -i '/initramfs rootfs.cpio/d' "$USRPATH"/save/config.txt
+		cp -r /boot/filter "$USRPATH"/save
+		cp /boot/btdb.tar "$USRPATH"/save
 	echo "Unmounting SD-Card..."
 		cd /
 		umount /boot
@@ -125,11 +134,11 @@ update(){
 	echo "Mounting updated partition..."
 		mount /dev/mmcblk0p1 /boot
 		sleep 1
-	echo "Restoring user configuration file..."
+	echo "Restoring user files..."
 		cp -r "$USRPATH"/save/userconfig.txt /boot
-		cp -r "$USRPATH"save//config.txt /boot
-	echo "Writing version file to boot partition..."
-	echo "$REMOTE_VERSION" > /boot/version
+		[[ "$REMOTE_VERSION" != "3.50" && "$REMOTE_VERSION" != "3.56" ]] && cp -r "$USRPATH"/save/config.txt /boot
+		cp -r "$USRPATH"/save/filter /boot
+		cp -r "$USRPATH"/save/btdb.tar /boot
 	echo "Everything done, will reboot now. Please wait 20 seconds and DO NOT refresh page. Click System or Configuration link above."
 
 	# Queues reboot in 5s and exits script - that gives the ui-server time to respond back to user

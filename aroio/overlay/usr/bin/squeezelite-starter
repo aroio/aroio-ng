@@ -2,14 +2,37 @@
 
 . /boot/userconfig.txt
 
+SERVER_RESAMPL="OFF"
+
 MACADDRESS=$(cat /sys/class/net/eth0/address)
 
+[ "$SERVER_RESAMPL" = "ON" ] && SERVER_RESAMPL=" -r "$RATE"-"$RATE""
+
+# For the life of my I cannot figure out, why I cannot give '-s $SERVERNAME' on the cmdline!?!
 if [ "$SERVERNAME" = "" ]
-then	SERVEROPTS=""
-else	SERVEROPTS="-s $SERVERNAME"
-	[ "$SERVERPORT" != "" ] && SERVEROPTS=""$SERVEROPTS":"$SERVERPORT""
+then	taskset -c 2,3 squeezelite \
+		-Z "$SQUEEZE_MAXFREQUENCY" \
+		-M "$PLATFORM"	\
+		-m "$MACADDRESS" \
+		-n "$PLAYERNAME" \
+		-p 45 \
+		-a 145:4::1 \
+		-b "$SQUEEZE_INTBUFFER":"$SQUEEZE_OUTBUFFER" \
+		-d all=info \
+		-o "$AUDIO_OUTPUT"
+
+
+
+else	taskset -c 2,3 squeezelite \
+		-Z "$SQUEEZE_MAXFREQUENCY" \
+		-s "$SERVERNAME" \
+		-M "$PLATFORM" \
+		-m "$MACADDRESS" \
+		-n "$PLAYERNAME" \
+		-p 45 \
+		-a 145:4::1 \
+		-b "$SQUEEZE_INTBUFFER":"$SQUEEZE_OUTBUFFER" \
+		-d all=info \
+		-o "$AUDIO_OUTPUT"
 fi
 
-echo $SERVEROPTS
-
-squeezelite $SERVEROPTS -M "$PLATFORM" -m "$MACADDRESS" -n "$PLAYERNAME" -p 90 -a "$SQUEEZE_ALSABUFFER":"$SQUEEZE_ALSAPERIOD"::1 -b "$SQUEEZE_INTBUFFER":"$SQUEEZE_OUTBUFFER" -d all=info -o "$AUDIO_OUTPUT"

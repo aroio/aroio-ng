@@ -1,0 +1,12 @@
+[Unit]
+Description=setting bluetooth broadcast name
+ConditionPathIsDirectory=/sys/class/bluetooth
+After=preparenetwork.service
+
+[Service]
+Type=oneshot 
+EnvironmentFile=/boot/userconfig.txt
+ExecStart=/bin/hciconfig hci0 name ${PLAYERNAME}
+
+[Install]
+WantedBy=multi-user.target
