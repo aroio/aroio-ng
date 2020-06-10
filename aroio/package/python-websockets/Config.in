@@ -1,0 +1,7 @@
+config BR2_PACKAGE_PYTHON_WEBSOCKETS
+	bool "python-websockets"
+	help
+	  An implementation of the WebSocket Protocol (RFC 6455 &
+	  7692).
+
+	  https://github.com/aaugustin/websockets

@@ -1,0 +1,5 @@
+# md5, sha256 from https://pypi.org/pypi/pydantic/json
+md5	866774950cb506f15c309875b7297240  pydantic-1.5.1.tar.gz
+sha256	f0018613c7a0d19df3240c2a913849786f21b6539b9f23d85ce4067489dfacfa  pydantic-1.5.1.tar.gz
+# Locally computed sha256 checksums
+sha256	66badbfe56618ec52ddcbfda62450e43752d16fe1e7cae78d346c7ed10a35306  LICENSE
