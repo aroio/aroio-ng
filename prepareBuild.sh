@@ -10,8 +10,8 @@
 
 #####################
 # Get latest release of Webinterface and API
-LATEST_INTERFACE=$(curl --silent "https://api.github.com/repos/aroio/webinterface/tags" | jq -r '.[-1].name')
-LATEST_API=$(curl --silent "https://api.github.com/repos/aroio/web-api/tags" | jq -r '.[-1].name')
+LATEST_INTERFACE=$(curl --silent "https://api.github.com/repos/aroio/webinterface/tags" | jq -r '.[0].name')
+LATEST_API=$(curl --silent "https://api.github.com/repos/aroio/web-api/tags" | jq -r '.[0].name')
 
 #####################
 # Remove old webinterface and api
