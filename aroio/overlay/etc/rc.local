@@ -13,4 +13,7 @@ loadkmap < /etc/de.map
 rm /etc/localtime
 ln -s /usr/share/zoneinfo/Europe/Berlin /etc/localtime
 
+# Startup Webinterface API
+/opt/api/main.py
+
 exit 0
