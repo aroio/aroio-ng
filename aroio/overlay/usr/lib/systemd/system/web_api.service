@@ -1,0 +1,11 @@
+[Unit]
+Description=FastAPI Web API for Webinterface and Apps
+After=systemd-networkd.service
+After=sys-subsystem-net-devices-wlan.device hostapd-preparation.service
+BindsTo=hostapd.service
+ConditionPathExists=/opt/api
+
+[Service]
+Type=simple
+ExecStart=/opt/api/main.py
+
