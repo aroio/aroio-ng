@@ -2,9 +2,11 @@
 Description=FastAPI Web API for Webinterface and Apps
 Requires=network.target checkuserconfig.service
 After=checkuserconfig.service
-ConditionPathExists=/opt/api
 
 [Service]
 Type=simple
-ExecStart=/opt/api/main.py
+ExecStart=/bin/python /opt/api/startup_api.py
 Restart=always
+
+[Install]
+WantedBy=multi-user.target
