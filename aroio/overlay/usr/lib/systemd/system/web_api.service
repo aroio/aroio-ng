@@ -5,7 +5,7 @@ After=checkuserconfig.service
 
 [Service]
 Type=simple
-ExecStart=/bin/python /opt/api/startup_api.py
+ExecStart=/bin/python3 /opt/api/startup_api.py
 Restart=always
 
 [Install]
